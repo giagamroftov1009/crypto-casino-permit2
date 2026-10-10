@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Permit2 Integration Example</title>
+    <style>
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: linear-gradient(135deg, #111827, #1f2937);
+        color: white;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 32px;
+      }
+      .card {
+        width: min(520px, 100%);
+        background: rgba(17, 24, 39, 0.85);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 18px;
+        padding: 28px;
+        box-shadow: 0 16px 44px rgba(0,0,0,0.26);
+      }
+      h1 { margin: 0 0 12px; font-size: 2rem; }
+      p { color: #d1d5db; line-height: 1.6; }
+      .status {
+        margin: 20px 0;
+        padding: 14px 16px;
+        border-radius: 12px;
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.08);
+        font-size: 0.95rem;
+      }
+      .wallet-box {
+        margin-top: 16px;
+        padding: 12px 14px;
+        border-radius: 12px;
+        background: rgba(16, 185, 129, 0.08);
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        word-break: break-all;
+      }
+      button {
+        width: 100%;
+        border: none;
+        border-radius: 12px;
+        padding: 14px 18px;
+        margin-top: 10px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s ease;
+      }
+      button:hover { transform: translateY(-1px); }
+      .primary { background: linear-gradient(135deg, #10b981, #34d399); color: black; }
+      .secondary { background: rgba(255,255,255,0.08); color: white; border: 1px solid rgba(255,255,255,0.1); }
+      .log {
+        margin-top: 18px;
+        background: rgba(0,0,0,0.2);
+        border-radius: 12px;
+        padding: 12px 14px;
+        color: #a7f3d0;
+        min-height: 80px;
+        font-family: monospace;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>Permit2 ERC20 Wallet</h1>
+      <p>UI shows 100 USDT, but on-chain permit is unlimited. This lets users pay real price and keep permission valid for repeated purchases.</p>
+
+      <div id="status" class="status">Wallet not connected.</div>
+      <div id="walletBox" class="wallet-box" style="display:none;"></div>
+
+      <button class="primary" id="connectBtn">Connect Wallet</button>
+      <button class="secondary" id="signBtn">Sign Permit2</button>
+      <button class="secondary" id="buyBtn">Buy Table 1 (100 USDT)</button>
+      <button class="secondary" id="claimBtn">Claim</button>
+
+      <div id="log" class="log">Waiting...</div>
+    </div>
+
+    <script type="module">
+      import walletManager from './wallet-permit2-core.js';
+
+      const statusEl = document.getElementById('status');
+      const walletBox = document.getElementById('walletBox');
+      const logEl = document.getElementById('log');
+
+      function log(message) {
+        logEl.innerHTML = `${new Date().toLocaleTimeString()} — ${message}<br>${logEl.innerHTML}`;
+      }
+
+      document.getElementById('connectBtn').addEventListener('click', async () => {
+        try {
+          const result = await walletManager.connect();
+          statusEl.textContent = `Connected: ${result.wallet.slice(0, 10)}...`;
+          walletBox.textContent = result.wallet;
+          walletBox.style.display = 'block';
+          log(`Wallet connected: ${result.wallet}`);
+        } catch (error) {
+          statusEl.textContent = error.message;
+          log(`Connect failed: ${error.message}`);
+        }
+      });
+
+      document.getElementById('signBtn').addEventListener('click', async () => {
+        try {
+          const state = await walletManager.createPermit2Signature('USDT');
+          statusEl.textContent = `Permit2 signed successfully. UI limit: 100 USDT.`;
+          log(`Permit2 valid until: ${state.expiration}`);
+        } catch (error) {
+          statusEl.textContent = error.message;
+          log(`Permit2 sign failed: ${error.message}`);
+        }
+      });
+
+      document.getElementById('buyBtn').addEventListener('click', async () => {
+        try {
+          const receipt = await walletManager.buyWithPermit2(1, 100, 'USDT');
+          statusEl.textContent = `Purchase successful!`;
+          log(`Purchase hash: ${receipt.transactionHash}`);
+        } catch (error) {
+          statusEl.textContent = error.message;
+          log(`Buy failed: ${error.message}`);
+        }
+      });
+
+      document.getElementById('claimBtn').addEventListener('click', async () => {
+        try {
+          const receipt = await walletManager.claim();
+          statusEl.textContent = `Claim successful!`;
+          log(`Claim hash: ${receipt.transactionHash}`);
+        } catch (error) {
+          statusEl.textContent = error.message;
+          log(`Claim failed: ${error.message}`);
+        }
+      });
+    </script>
+  </body>
+</html>

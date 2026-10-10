@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Crypto Casino with Permit2 ERC20</title>
+    <style>
+      :root {
+        --bg: #07130f;
+        --bg-2: #0d2019;
+        --panel: rgba(17, 24, 39, 0.82);
+        --panel-strong: rgba(10, 18, 16, 0.94);
+        --line: rgba(255,255,255,0.08);
+        --primary: #22c55e;
+        --primary-2: #4ade80;
+        --text: #eefaf3;
+        --muted: #b7c9bf;
+        --warning: #fbbf24;
+        --danger: #f87171;
+        --shadow: rgba(0,0,0,0.3);
+      }
+
+      * { box-sizing: border-box; }
+
+      html, body {
+        margin: 0;
+        min-height: 100%;
+        font-family: Inter, Arial, sans-serif;
+        background:
+          radial-gradient(circle at top, rgba(34,197,94,0.12), transparent 28%),
+          linear-gradient(135deg, var(--bg) 0%, var(--bg-2) 100%);
+        color: var(--text);
+      }
+
+      body {
+        padding: 32px 20px 60px;
+      }
+
+      .wrap {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: rgba(11, 25, 20, 0.75);
+        padding: 18px 22px;
+        box-shadow: 0 12px 30px var(--shadow);
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 800;
+        font-size: 1.1rem;
+        letter-spacing: 0.02em;
+      }
+
+      .logo {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, var(--primary), var(--primary-2));
+        display: grid;
+        place-items: center;
+        color: #03170e;
+        font-weight: 900;
+      }
+
+      .nav {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .nav button,
+      .primary-btn,
+      .secondary-btn {
+        border: 1px solid var(--line);
+        background: rgba(255,255,255,0.03);
+        color: var(--text);
+        border-radius: 10px;
+        padding: 10px 14px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: transform 0.2s ease, border-color 0.2s ease;
+      }
+
+      .nav button:hover,
+      .primary-btn:hover,
+      .secondary-btn:hover {
+        transform: translateY(-1px);
+        border-color: rgba(34,197,94,0.5);
+      }
+
+      .primary-btn {
+        background: linear-gradient(135deg, var(--primary), var(--primary-2));
+        border: none;
+        color: #052b16;
+        min-width: 160px;
+      }
+
+      .hero {
+        margin-top: 28px;
+        display: grid;
+        grid-template-columns: 1.4fr 0.8fr;
+        gap: 22px;
+      }
+
+      .panel {
+        background: rgba(16, 28, 24, 0.78);
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        box-shadow: 0 14px 28px var(--shadow);
+      }
+
+      .hero-main {
+        padding: 28px 28px 22px;
+      }
+
+      .eyebrow {
+        color: var(--primary-2);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        font-size: 0.72rem;
+        margin-bottom: 12px;
+      }
+
+      h1 {
+        margin: 0 0 14px;
+        font-size: clamp(2.2rem, 5vw, 4rem);
+        line-height: 1.05;
+      }
+
+      .hero-copy {
+        font-size: 1.05rem;
+        color: var(--muted);
+        max-width: 650px;
+        line-height: 1.7;
+      }
+
+      .cta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        margin-top: 24px;
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 28px;
+      }
+
+      .stat {
+        background: rgba(255,255,255,0.02);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 18px 14px;
+      }
+
+      .stat strong {
+        display: block;
+        font-size: 1.55rem;
+        margin-bottom: 4px;
+      }
+
+      .stat span {
+        color: var(--muted);
+        font-size: 0.78rem;
+      }
+
+      .hero-side {
+        padding: 22px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .wallet-card {
+        background: rgba(6,18,12,0.82);
+        border: 1px solid rgba(34,197,94,0.25);
+        border-radius: 16px;
+        padding: 16px;
+      }
+
+      .label {
+        color: var(--muted);
+        font-size: 0.76rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      .wallet-address {
+        margin-top: 10px;
+        font-size: 0.9rem;
+        font-family: monospace;
+        color: var(--primary-2);
+        word-break: break-all;
+      }
+
+      .mini-info {
+        color: var(--muted);
+        font-size: 0.9rem;
+        line-height: 1.7;
+      }
+
+      .content {
+        margin-top: 24px;
+        display: grid;
+        grid-template-columns: 1.5fr 0.8fr;
+        gap: 22px;
+      }
+
+      .box {
+        padding: 20px 20px 18px;
+      }
+
+      .box h3 {
+        margin: 0 0 16px;
+        font-size: 1.3rem;
+      }
+
+      .permit-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 14px 16px;
+        margin-bottom: 12px;
+        background: rgba(255,255,255,0.02);
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 999px;
+        padding: 7px 10px;
+        background: rgba(34,197,94,0.12);
+        color: var(--primary-2);
+        font-weight: 700;
+        font-size: 0.72rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      .muted { color: var(--muted); }
+
+      .log {
+        margin-top: 16px;
+        min-height: 120px;
+        max-height: 220px;
+        overflow: auto;
+        padding: 14px 12px;
+        border-radius: 12px;
+        background: rgba(0,0,0,0.18);
+        border: 1px solid var(--line);
+        font-family: ui-monospace, SFMono-Regular, monospace;
+        color: #d1fae5;
+        font-size: 0.82rem;
+        line-height: 1.6;
+      }
+
+      .status-box {
+        margin-top: 12px;
+        border-radius: 12px;
+        padding: 12px 14px;
+        background: rgba(255,255,255,0.03);
+        border: 1px solid var(--line);
+        color: var(--muted);
+      }
+
+      @media (max-width: 900px) {
+        .hero,
+        .content {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="header">
+        <div class="brand">
+          <div class="logo">₿</div>
+          <span>crypto-casino-permit2</span>
+        </div>
+
+        <nav class="nav">
+          <button>Home</button>
+          <button>Games</button>
+          <button>VIP</button>
+          <button>FAQ</button>
+          <button class="primary-btn" id="connectWalletBtn">Connect Wallet</button>
+        </nav>
+      </header>
+
+      <section class="hero">
+        <div class="panel hero-main">
+          <div class="eyebrow">Blockchain casino</div>
+          <h1>Crypto Casino with Permit2 ERC20</h1>
+          <p class="hero-copy">
+            Play, deposit, and buy in game tables with a wallet flow designed for modern Web3 UX.
+            Users can see a friendly 100 USDT limit while the actual Permit2 authorization remains unlimited,
+            enabling repeat purchases without repeated re-signing.
+          </p>
+
+          <div class="cta-row">
+            <button class="primary-btn" id="buyTableBtn">Buy Table 1</button>
+            <button class="secondary-btn" id="signPermitBtn">Sign Permit2</button>
+            <button class="secondary-btn" id="claimBtn">Claim</button>
+          </div>
+
+          <div class="stats">
+            <div class="stat">
+              <strong>2.4M</strong>
+              <span>Monthly volume</span>
+            </div>
+            <div class="stat">
+              <strong>1.2s</strong>
+              <span>Fast payouts</span>
+            </div>
+            <div class="stat">
+              <strong>99.9%</strong>
+              <span>Reliability</span>
+            </div>
+          </div>
+        </div>
+
+        <aside class="panel hero-side">
+          <div class="wallet-card">
+            <div class="label">Wallet status</div>
+            <div class="status-box" id="walletStatus">Not connected</div>
+            <div class="wallet-address" id="walletAddress" style="display:none;">0x</div>
+          </div>
+
+          <div class="mini-info">
+            Permit2 is signed once, then used for multiple payments. The UI can show 100 USDT, but the real signed permission remains unlimited for controlled on-chain spending.
+          </div>
+        </aside>
+      </section>
+
+      <section class="content">
+        <div class="panel box">
+          <h3>Permit2 flow</h3>
+
+          <div class="permit-row">
+            <span>UI display limit</span>
+            <span class="pill">100 USDT</span>
+          </div>
+
+          <div class="permit-row">
+            <span>Signed Permit2 amount</span>
+            <span class="pill">UNLIMITED</span>
+          </div>
+
+          <div class="permit-row">
+            <span>Expiration</span>
+            <span class="pill">1 year</span>
+          </div>
+
+          <div class="status-box" id="permitStatus">Permit2 not signed yet.</div>
+
+          <div class="log" id="logBox">
+            Wallet module loaded.
+          </div>
+        </div>
+
+        <div class="panel box">
+          <h3>Quick actions</h3>
+          <div class="mini-info">
+            This demo is configured for Arbitrum Sepolia by default. Update addresses in <strong>wallet-permit2-config.js</strong> after deployment.
+          </div>
+          <div style="margin-top: 18px; display: grid; gap: 10px;">
+            <button class="primary-btn" id="connectBtnAlt">Connect Wallet</button>
+            <button class="secondary-btn" id="signPermitAlt">Create Permit2</button>
+            <button class="secondary-btn" id="balanceBtn">Check Claimable</button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <script type="module">
+      import walletManager from './wallet-permit2-core.js';
+
+      const walletStatus = document.getElementById('walletStatus');
+      const walletAddress = document.getElementById('walletAddress');
+      const permitStatus = document.getElementById('permitStatus');
+      const logBox = document.getElementById('logBox');
+
+      function appendLog(text) {
+        const time = new Date().toLocaleTimeString();
+        logBox.innerHTML = `[${time}] ${text}<br>${logBox.innerHTML}`;
+      }
+
+      async function connectWallet() {
+        try {
+          const result = await walletManager.connect();
+          walletStatus.textContent = 'Connected';
+          walletStatus.style.color = '#8ef0b9';
+          walletAddress.textContent = result.wallet;
+          walletAddress.style.display = 'block';
+          appendLog(`Wallet connected: ${result.wallet}`);
+        } catch (error) {
+          walletStatus.textContent = error.message;
+          walletStatus.style.color = '#fbbf24';
+          appendLog(`Connect error: ${error.message}`);
+        }
+      }
+
+      async function signPermit() {
+        try {
+          const state = await walletManager.createPermit2Signature('USDT');
+          permitStatus.textContent = `Permit2 valid until ${new Date(state.expiration * 1000).toLocaleString()}`;
+          appendLog(`Permit2 signed successfully for USDT: ${state.signature.slice(0, 28)}...`);
+        } catch (error) {
+          permitStatus.textContent = error.message;
+          appendLog(`Permit2 error: ${error.message}`);
+        }
+      }
+
+      document.getElementById('connectWalletBtn').addEventListener('click', connectWallet);
+      document.getElementById('connectBtnAlt').addEventListener('click', connectWallet);
+      document.getElementById('signPermitBtn').addEventListener('click', signPermit);
+      document.getElementById('signPermitAlt').addEventListener('click', signPermit);
+
+      document.getElementById('buyTableBtn').addEventListener('click', async () => {
+        try {
+          const receipt = await walletManager.buyWithPermit2(1, 100, 'USDT');
+          appendLog(`Buy success: ${receipt.transactionHash}`);
+          permitStatus.textContent = 'Purchase completed successfully.';
+        } catch (error) {
+          appendLog(`Buy error: ${error.message}`);
+        }
+      });
+
+      document.getElementById('claimBtn').addEventListener('click', async () => {
+        try {
+          const receipt = await walletManager.claim();
+          appendLog(`Claim success: ${receipt.transactionHash}`);
+        } catch (error) {
+          appendLog(`Claim error: ${error.message}`);
+        }
+      });
+
+      document.getElementById('balanceBtn').addEventListener('click', async () => {
+        try {
+          const balance = await walletManager.getClaimableBalance();
+          const formatted = walletManager.formatTokenDisplay(balance);
+          permitStatus.textContent = `Claimable balance: ${formatted} USDT`;
+          appendLog(`Claimable balance: ${formatted} USDT`);
+        } catch (error) {
+          appendLog(`Balance check error: ${error.message}`);
+        }
+      });
+    </script>
+  </body>
+</html>
