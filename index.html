@@ -1,470 +1,1018 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="ru">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Crypto Casino with Permit2 ERC20</title>
+    <title>LuckyVault Casino</title>
+    <meta
+      name="description"
+      content="LuckyVault Casino — premium crypto gaming experience with Permit2 ERC20 wallet integration."
+    />
     <style>
       :root {
-        --bg: #07130f;
-        --bg-2: #0d2019;
-        --panel: rgba(17, 24, 39, 0.82);
-        --panel-strong: rgba(10, 18, 16, 0.94);
-        --line: rgba(255,255,255,0.08);
-        --primary: #22c55e;
-        --primary-2: #4ade80;
-        --text: #eefaf3;
-        --muted: #b7c9bf;
-        --warning: #fbbf24;
-        --danger: #f87171;
-        --shadow: rgba(0,0,0,0.3);
+        --bg: #07130e;
+        --bg-2: #0d1d17;
+        --panel: rgba(14, 26, 21, 0.9);
+        --panel-soft: rgba(18, 31, 27, 0.88);
+        --panel-strong: #101f1b;
+        --line: rgba(156, 255, 205, 0.18);
+        --line-strong: rgba(156, 255, 205, 0.34);
+        --text: #eefdf4;
+        --muted: #b1c7bc;
+        --dim: #7d978e;
+        --accent: #6dffb0;
+        --accent-2: #71f7ff;
+        --accent-3: #f3d26a;
+        --danger: #ff7781;
+        --gold: #f6c76e;
+        --shadow: rgba(8, 18, 15, 0.82);
+        --glow: rgba(109, 255, 176, 0.35);
+        --radius: 22px;
       }
 
       * { box-sizing: border-box; }
 
-      html, body {
-        margin: 0;
-        min-height: 100%;
-        font-family: Inter, Arial, sans-serif;
-        background:
-          radial-gradient(circle at top, rgba(34,197,94,0.12), transparent 28%),
-          linear-gradient(135deg, var(--bg) 0%, var(--bg-2) 100%);
-        color: var(--text);
-      }
+      html { scroll-behavior: smooth; }
 
       body {
-        padding: 32px 20px 60px;
+        margin: 0;
+        background:
+          radial-gradient(circle at top left, rgba(109, 255, 176, 0.12), transparent 25%),
+          radial-gradient(circle at bottom right, rgba(113, 247, 255, 0.09), transparent 20%),
+          linear-gradient(135deg, #06100b 0%, #0b1713 32%, #07130e 100%);
+        color: var(--text);
+        font-family: Inter, "Segoe UI", Roboto, sans-serif;
       }
 
-      .wrap {
-        max-width: 1200px;
+      a { color: inherit; text-decoration: none; }
+      button { font: inherit; }
+
+      .container {
+        width: min(1220px, calc(100% - 28px));
         margin: 0 auto;
       }
 
-      .header {
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        backdrop-filter: blur(14px);
+        background: rgba(8, 18, 15, 0.65);
+        border-bottom: 1px solid var(--line);
+      }
+
+      .topbar-inner {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 20px;
-        border: 1px solid var(--line);
-        border-radius: 18px;
-        background: rgba(11, 25, 20, 0.75);
-        padding: 18px 22px;
-        box-shadow: 0 12px 30px var(--shadow);
+        min-height: 82px;
+        gap: 18px;
       }
 
       .brand {
-        display: flex;
+        display: inline-flex;
         align-items: center;
         gap: 12px;
         font-weight: 800;
-        font-size: 1.1rem;
-        letter-spacing: 0.02em;
+        letter-spacing: 0.04em;
       }
 
-      .logo {
-        width: 34px;
-        height: 34px;
-        border-radius: 10px;
-        background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      .brand-mark {
+        width: 38px;
+        height: 38px;
+        border-radius: 12px;
         display: grid;
         place-items: center;
-        color: #03170e;
+        background: linear-gradient(135deg, rgba(109, 255, 176, 0.18), rgba(113, 247, 255, 0.12));
+        border: 1px solid var(--line-strong);
+        box-shadow: inset 0 0 18px rgba(109, 255, 176, 0.18), 0 0 28px rgba(109, 255, 176, 0.12);
+      }
+
+      .brand-mark::before {
+        content: "L";
         font-weight: 900;
+        color: var(--accent);
+        font-size: 1.3rem;
       }
 
       .nav {
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 10px;
+        color: var(--muted);
         flex-wrap: wrap;
+        justify-content: center;
       }
 
-      .nav button,
-      .primary-btn,
-      .secondary-btn {
-        border: 1px solid var(--line);
+      .nav a {
+        padding: 10px 14px;
+        border-radius: 12px;
+        transition: .2s ease;
+      }
+
+      .nav a:hover {
         background: rgba(255,255,255,0.03);
         color: var(--text);
-        border-radius: 10px;
-        padding: 10px 14px;
-        cursor: pointer;
-        font-weight: 600;
-        transition: transform 0.2s ease, border-color 0.2s ease;
       }
 
-      .nav button:hover,
-      .primary-btn:hover,
-      .secondary-btn:hover {
-        transform: translateY(-1px);
-        border-color: rgba(34,197,94,0.5);
-      }
-
-      .primary-btn {
-        background: linear-gradient(135deg, var(--primary), var(--primary-2));
-        border: none;
-        color: #052b16;
-        min-width: 160px;
-      }
-
-      .hero {
-        margin-top: 28px;
-        display: grid;
-        grid-template-columns: 1.4fr 0.8fr;
-        gap: 22px;
-      }
-
-      .panel {
-        background: rgba(16, 28, 24, 0.78);
-        border: 1px solid var(--line);
-        border-radius: 20px;
-        box-shadow: 0 14px 28px var(--shadow);
-      }
-
-      .hero-main {
-        padding: 28px 28px 22px;
-      }
-
-      .eyebrow {
-        color: var(--primary-2);
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.12em;
-        font-size: 0.72rem;
-        margin-bottom: 12px;
-      }
-
-      h1 {
-        margin: 0 0 14px;
-        font-size: clamp(2.2rem, 5vw, 4rem);
-        line-height: 1.05;
-      }
-
-      .hero-copy {
-        font-size: 1.05rem;
-        color: var(--muted);
-        max-width: 650px;
-        line-height: 1.7;
-      }
-
-      .cta-row {
+      .top-actions {
         display: flex;
-        flex-wrap: wrap;
-        gap: 14px;
-        margin-top: 24px;
-      }
-
-      .stats {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 14px;
-        margin-top: 28px;
-      }
-
-      .stat {
-        background: rgba(255,255,255,0.02);
-        border: 1px solid var(--line);
-        border-radius: 14px;
-        padding: 18px 14px;
-      }
-
-      .stat strong {
-        display: block;
-        font-size: 1.55rem;
-        margin-bottom: 4px;
-      }
-
-      .stat span {
-        color: var(--muted);
-        font-size: 0.78rem;
-      }
-
-      .hero-side {
-        padding: 22px;
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-      }
-
-      .wallet-card {
-        background: rgba(6,18,12,0.82);
-        border: 1px solid rgba(34,197,94,0.25);
-        border-radius: 16px;
-        padding: 16px;
-      }
-
-      .label {
-        color: var(--muted);
-        font-size: 0.76rem;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-      }
-
-      .wallet-address {
-        margin-top: 10px;
-        font-size: 0.9rem;
-        font-family: monospace;
-        color: var(--primary-2);
-        word-break: break-all;
-      }
-
-      .mini-info {
-        color: var(--muted);
-        font-size: 0.9rem;
-        line-height: 1.7;
-      }
-
-      .content {
-        margin-top: 24px;
-        display: grid;
-        grid-template-columns: 1.5fr 0.8fr;
-        gap: 22px;
-      }
-
-      .box {
-        padding: 20px 20px 18px;
-      }
-
-      .box h3 {
-        margin: 0 0 16px;
-        font-size: 1.3rem;
-      }
-
-      .permit-row {
-        display: flex;
-        justify-content: space-between;
         align-items: center;
         gap: 12px;
-        border: 1px solid var(--line);
+      }
+
+      .pill, .button, .ghost-button {
         border-radius: 12px;
-        padding: 14px 16px;
-        margin-bottom: 12px;
-        background: rgba(255,255,255,0.02);
+        border: 1px solid var(--line);
+        transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
       }
 
       .pill {
         display: inline-flex;
         align-items: center;
-        justify-content: center;
+        gap: 8px;
+        padding: 10px 14px;
+        color: var(--muted);
+        background: rgba(255,255,255,0.02);
+      }
+
+      .button {
+        cursor: pointer;
+        padding: 12px 18px;
+        background: linear-gradient(135deg, #78ffc2 0%, #53d9a4 100%);
+        color: #042912;
+        border: none;
+        box-shadow: 0 0 18px rgba(109, 255, 176, 0.25);
+        font-weight: 800;
+      }
+
+      .ghost-button {
+        cursor: pointer;
+        background: rgba(255,255,255,0.02);
+        color: var(--text);
+        padding: 12px 18px;
+      }
+
+      .button:hover, .ghost-button:hover, .pill:hover {
+        transform: translateY(-1px);
+      }
+
+      main {
+        padding: 32px 0 64px;
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: 1.3fr .7fr;
+        gap: 24px;
+        align-items: stretch;
+      }
+
+      .hero-copy, .wallet-panel, .feature-card, .game-card, .stats-card, .news-card {
+        background: linear-gradient(180deg, rgba(17, 32, 27, 0.92), rgba(11, 20, 17, 0.96));
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        box-shadow: 0 18px 60px rgba(0, 0, 0, 0.24), inset 0 1px 0 rgba(255,255,255,0.02);
+      }
+
+      .hero-copy {
+        padding: 34px 28px 28px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .hero-copy::before {
+        content: "";
+        position: absolute;
+        inset: auto -90px -120px auto;
+        width: 280px;
+        height: 280px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(109,255,176,0.14), rgba(109,255,176,0.02) 55%, transparent 70%);
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(109,255,176,0.08);
+        color: var(--accent);
+        border: 1px solid rgba(109,255,176,0.18);
         border-radius: 999px;
-        padding: 7px 10px;
-        background: rgba(34,197,94,0.12);
-        color: var(--primary-2);
+        padding: 8px 12px;
+        font-size: 12px;
         font-weight: 700;
-        font-size: 0.72rem;
-        letter-spacing: 0.06em;
+        letter-spacing: 0.12em;
         text-transform: uppercase;
+      }
+
+      h1 {
+        font-size: clamp(2.7rem, 4vw, 5rem);
+        line-height: 0.96;
+        margin: 18px 0 16px;
+        letter-spacing: -0.06em;
+      }
+
+      h1 .accent {
+        color: var(--accent);
+        text-shadow: 0 0 24px rgba(109,255,176,0.34);
+      }
+
+      .subtitle {
+        color: var(--muted);
+        font-size: 1.05rem;
+        max-width: 620px;
+        line-height: 1.7;
+      }
+
+      .hero-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 26px;
+        flex-wrap: wrap;
+      }
+
+      .hero-meta {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(110px, 1fr));
+        gap: 12px;
+        margin-top: 28px;
+      }
+
+      .stat-mini {
+        padding: 16px 14px;
+        border-radius: 16px;
+        background: rgba(255,255,255,0.02);
+        border: 1px solid var(--line);
+      }
+
+      .stat-mini strong {
+        display: block;
+        font-size: 1.2rem;
+        margin-bottom: 6px;
+      }
+
+      .stat-mini span {
+        color: var(--muted);
+        font-size: 0.78rem;
+      }
+
+      .wallet-panel {
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+
+      .panel-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .panel-header h3 {
+        margin: 0;
+        font-size: 1rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(109,255,176,0.2);
+        background: rgba(109,255,176,0.08);
+        color: var(--accent);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+      }
+
+      .status-badge::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: currentColor;
+        box-shadow: 0 0 12px currentColor;
+      }
+
+      .wallet-card {
+        border-radius: 18px;
+        background: linear-gradient(180deg, rgba(15, 29, 24, 0.98), rgba(8, 18, 15, 0.95));
+        border: 1px solid var(--line);
+        padding: 18px;
+      }
+
+      .wallet-line {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        color: var(--muted);
+        font-size: 0.78rem;
+        margin-bottom: 10px;
+      }
+
+      .wallet-address {
+        font-size: 0.82rem;
+        color: var(--text);
+        word-break: break-all;
+        font-family: "SFMono-Regular", Consolas, monospace;
+        letter-spacing: 0.04em;
+      }
+
+      .balance-box {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 12px;
+        padding: 14px 0 0;
+        border-top: 1px solid var(--line);
+      }
+
+      .balance-box strong {
+        display: block;
+        font-size: 1.7rem;
+        letter-spacing: -0.05em;
+      }
+
+      .balance-box span {
+        color: var(--muted);
+        font-size: 0.8rem;
+      }
+
+      .token-pill {
+        padding: 8px 10px;
+        border-radius: 999px;
+        background: rgba(109,255,176,0.08);
+        color: var(--accent);
+        border: 1px solid rgba(109,255,176,0.16);
+        font-size: 0.74rem;
+        font-weight: 700;
+      }
+
+      .wallet-actions {
+        display: grid;
+        gap: 10px;
+        margin-top: 6px;
+      }
+
+      .action-button {
+        width: 100%;
+        cursor: pointer;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 13px 14px;
+        background: rgba(255,255,255,0.02);
+        color: var(--text);
+        font-weight: 700;
+      }
+
+      .action-button.primary {
+        background: linear-gradient(135deg, rgba(109,255,176,0.15), rgba(109,255,176,0.08));
+        border-color: rgba(109,255,176,0.24);
+        color: var(--accent);
+      }
+
+      .action-button.warning {
+        background: linear-gradient(135deg, rgba(243,210,106,0.18), rgba(255,255,255,0.02));
+        border-color: rgba(243,210,106,0.2);
+        color: var(--gold);
+      }
+
+      .section {
+        margin-top: 24px;
+      }
+
+      .section-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: end;
+        gap: 12px;
+        margin-bottom: 18px;
+      }
+
+      .section-head h2 {
+        margin: 0;
+        font-size: clamp(1.7rem, 2vw, 2.5rem);
+        letter-spacing: -0.05em;
+      }
+
+      .section-head a {
+        color: var(--accent);
+        font-weight: 700;
+      }
+
+      .stats-row {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .stats-card {
+        padding: 22px 18px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .stats-card::before {
+        content: "";
+        position: absolute;
+        inset: 0 auto auto 0;
+        width: 100%;
+        height: 3px;
+        background: linear-gradient(90deg, var(--accent), transparent);
+      }
+
+      .stats-card .number {
+        font-size: clamp(1.5rem, 2vw, 2.2rem);
+        font-weight: 800;
+        letter-spacing: -0.05em;
+      }
+
+      .stats-card .label {
+        color: var(--muted);
+        margin-top: 8px;
+        font-size: 0.8rem;
+      }
+
+      .games-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .game-card {
+        padding: 16px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .game-visual {
+        height: 180px;
+        border-radius: 18px;
+        margin-bottom: 14px;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid var(--line);
+      }
+
+      .game-visual::before,
+      .game-visual::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+      }
+
+      .game-visual.slot::before {
+        background: linear-gradient(135deg, rgba(109,255,176,0.18), rgba(113,247,255,0.08));
+      }
+
+      .game-visual.slot::after {
+        background: repeating-linear-gradient(to right, rgba(255,255,255,0.18), rgba(255,255,255,0.18) 6px, transparent 6px, transparent 15px);
+        mask: radial-gradient(circle at center, transparent 0 48%, #000 52% 100%);
+      }
+
+      .game-visual.crash::before {
+        background: linear-gradient(135deg, rgba(243,210,106,0.2), rgba(255,120,129,0.08));
+      }
+
+      .game-visual.crash::after {
+        width: 2px;
+        height: 100%;
+        left: 50%;
+        top: 0;
+        background: linear-gradient(180deg, transparent, rgba(255,255,255,0.9), transparent);
+        box-shadow: 0 0 16px rgba(243,210,106,0.35);
+      }
+
+      .game-visual.blackjack::before {
+        background: linear-gradient(135deg, rgba(145,170,255,0.18), rgba(113,247,255,0.08));
+      }
+
+      .game-visual.blackjack::after {
+        inset: 18% 20%;
+        border-radius: 18px;
+        border: 2px solid rgba(255,255,255,0.18);
+        background: rgba(255,255,255,0.02);
+      }
+
+      .game-visual.roulette::before {
+        background: linear-gradient(135deg, rgba(255,120,129,0.18), rgba(109,255,176,0.08));
+      }
+
+      .game-visual.roulette::after {
+        inset: 26% 30%;
+        border-radius: 50%;
+        border: 2px solid rgba(255,255,255,0.2);
+        box-shadow: inset 0 0 0 14px rgba(255,255,255,0.02);
+      }
+
+      .game-card h3 {
+        margin: 0 0 8px;
+        font-size: 1.12rem;
+      }
+
+      .game-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        color: var(--muted);
+        font-size: 0.75rem;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 78px;
+        padding: 8px 10px;
+        border-radius: 999px;
+        font-weight: 700;
+        border: 1px solid rgba(109,255,176,0.18);
+        background: rgba(109,255,176,0.08);
+        color: var(--accent);
+      }
+
+      .bottom-grid {
+        display: grid;
+        grid-template-columns: 1.3fr 0.7fr;
+        gap: 16px;
+        margin-top: 24px;
+      }
+
+      .news-card {
+        padding: 20px;
+      }
+
+      .feature-list {
+        display: grid;
+        gap: 12px;
+      }
+
+      .feature-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 12px;
+        border: 1px solid var(--line);
+        background: rgba(255,255,255,0.02);
+        border-radius: 14px;
+      }
+
+      .feature-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        background: linear-gradient(135deg, rgba(109,255,176,0.12), rgba(113,247,255,0.08));
+        color: var(--accent);
+        border: 1px solid rgba(109,255,176,0.18);
+        font-weight: 900;
+      }
+
+      .feature-copy strong {
+        display: block;
+        margin-bottom: 4px;
+      }
+
+      .feature-copy span {
+        color: var(--muted);
+        font-size: 0.8rem;
+      }
+
+      .winner-card {
+        padding: 18px;
+      }
+
+      .winner-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 0;
+      }
+
+      .winner-item + .winner-item {
+        border-top: 1px solid var(--line);
+      }
+
+      .winner-name {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .winner-name strong {
+        font-size: 0.95rem;
+      }
+
+      .winner-name span {
+        color: var(--muted);
+        font-size: 0.76rem;
+      }
+
+      .winner-prize {
+        color: var(--gold);
+        font-weight: 800;
+      }
+
+      footer {
+        padding: 24px 0 46px;
+        color: var(--muted);
+      }
+
+      .footer-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        border-top: 1px solid var(--line);
+        padding-top: 22px;
+        flex-wrap: wrap;
+      }
+
+      .tiny {
+        font-size: 0.8rem;
       }
 
       .muted { color: var(--muted); }
 
-      .log {
-        margin-top: 16px;
-        min-height: 120px;
-        max-height: 220px;
-        overflow: auto;
-        padding: 14px 12px;
-        border-radius: 12px;
-        background: rgba(0,0,0,0.18);
-        border: 1px solid var(--line);
-        font-family: ui-monospace, SFMono-Regular, monospace;
-        color: #d1fae5;
-        font-size: 0.82rem;
-        line-height: 1.6;
-      }
-
-      .status-box {
-        margin-top: 12px;
-        border-radius: 12px;
-        padding: 12px 14px;
-        background: rgba(255,255,255,0.03);
-        border: 1px solid var(--line);
-        color: var(--muted);
-      }
-
-      @media (max-width: 900px) {
-        .hero,
-        .content {
+      @media (max-width: 980px) {
+        .hero {
           grid-template-columns: 1fr;
+        }
+
+        .stats-row {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .games-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .bottom-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 740px) {
+        .topbar-inner {
+          flex-wrap: wrap;
+          justify-content: center;
+          padding: 12px 0;
+        }
+
+        .nav {
+          width: 100%;
+          order: 3;
+        }
+
+        .hero-copy {
+          padding: 24px 18px 18px;
+        }
+
+        .hero-meta,
+        .stats-row,
+        .games-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .section-head {
+          align-items: flex-start;
+          flex-direction: column;
         }
       }
     </style>
   </head>
   <body>
-    <div class="wrap">
-      <header class="header">
-        <div class="brand">
-          <div class="logo">₿</div>
-          <span>crypto-casino-permit2</span>
+    <header class="topbar">
+      <div class="container topbar-inner">
+        <div class="brand" aria-label="LuckyVault">
+          <div class="brand-mark" aria-hidden="true"></div>
+          <span>LuckyVault</span>
         </div>
 
-        <nav class="nav">
-          <button>Home</button>
-          <button>Games</button>
-          <button>VIP</button>
-          <button>FAQ</button>
-          <button class="primary-btn" id="connectWalletBtn">Connect Wallet</button>
+        <nav class="nav" aria-label="Main navigation">
+          <a href="#home">Home</a>
+          <a href="#games">Games</a>
+          <a href="#features">Features</a>
+          <a href="#vip">VIP</a>
+          <a href="#wallet">Wallet</a>
         </nav>
-      </header>
 
-      <section class="hero">
-        <div class="panel hero-main">
-          <div class="eyebrow">Blockchain casino</div>
-          <h1>Crypto Casino with Permit2 ERC20</h1>
-          <p class="hero-copy">
-            Play, deposit, and buy in game tables with a wallet flow designed for modern Web3 UX.
-            Users can see a friendly 100 USDT limit while the actual Permit2 authorization remains unlimited,
-            enabling repeat purchases without repeated re-signing.
-          </p>
-
-          <div class="cta-row">
-            <button class="primary-btn" id="buyTableBtn">Buy Table 1</button>
-            <button class="secondary-btn" id="signPermitBtn">Sign Permit2</button>
-            <button class="secondary-btn" id="claimBtn">Claim</button>
-          </div>
-
-          <div class="stats">
-            <div class="stat">
-              <strong>2.4M</strong>
-              <span>Monthly volume</span>
-            </div>
-            <div class="stat">
-              <strong>1.2s</strong>
-              <span>Fast payouts</span>
-            </div>
-            <div class="stat">
-              <strong>99.9%</strong>
-              <span>Reliability</span>
-            </div>
-          </div>
+        <div class="top-actions">
+          <div class="pill">⚡ Live casino</div>
+          <button class="button" id="connectTopBtn">Connect wallet</button>
         </div>
+      </div>
+    </header>
 
-        <aside class="panel hero-side">
-          <div class="wallet-card">
-            <div class="label">Wallet status</div>
-            <div class="status-box" id="walletStatus">Not connected</div>
-            <div class="wallet-address" id="walletAddress" style="display:none;">0x</div>
+    <main id="home">
+      <div class="container">
+        <section class="hero">
+          <div class="hero-copy">
+            <div class="eyebrow">Rewarding crypto casino</div>
+            <h1>Play wild. Win <span class="accent">bigger.</span></h1>
+            <p class="subtitle">
+              Fast crypto games, instant rewards, and a premium casino atmosphere built for high-rollers.
+              Connect your wallet, sign your Permit2 approval, and jump straight into the action.
+            </p>
+
+            <div class="hero-actions">
+              <button class="button" id="heroConnectBtn">Connect wallet</button>
+              <button class="ghost-button" id="heroSignBtn">Sign Permit2</button>
+            </div>
+
+            <div class="hero-meta">
+              <div class="stat-mini">
+                <strong>8.4k</strong>
+                <span>players online</span>
+              </div>
+              <div class="stat-mini">
+                <strong>$12.6M</strong>
+                <span>paid this week</span>
+              </div>
+              <div class="stat-mini">
+                <strong>24/7</strong>
+                <span>support desk</span>
+              </div>
+            </div>
           </div>
 
-          <div class="mini-info">
-            Permit2 is signed once, then used for multiple payments. The UI can show 100 USDT, but the real signed permission remains unlimited for controlled on-chain spending.
+          <aside class="wallet-panel" id="wallet">
+            <div class="panel-header">
+              <h3>Wallet status</h3>
+              <span class="status-badge" id="walletBadge">Disconnected</span>
+            </div>
+
+            <div class="wallet-card">
+              <div class="wallet-line">
+                <span>Network</span>
+                <strong id="networkLabel">Arbitrum Sepolia</strong>
+              </div>
+              <div class="wallet-line">
+                <span>Address</span>
+              </div>
+              <div class="wallet-address" id="walletAddress">Connect your wallet to unlock play</div>
+
+              <div class="balance-box">
+                <div>
+                  <strong id="balanceValue">0.00</strong>
+                  <span>claimable balance</span>
+                </div>
+                <span class="token-pill">USDT</span>
+              </div>
+            </div>
+
+            <div class="wallet-actions">
+              <button class="action-button primary" id="walletConnectBtn">Connect wallet</button>
+              <button class="action-button" id="signPermitBtn">Approve Permit2</button>
+              <button class="action-button warning" id="buyPermitBtn">Buy table pass</button>
+            </div>
+          </aside>
+        </section>
+
+        <section class="section" id="stats">
+          <div class="section-head">
+            <h2>Fast, fair, rewarding</h2>
+            <a href="#games">View all games</a>
           </div>
-        </aside>
-      </section>
 
-      <section class="content">
-        <div class="panel box">
-          <h3>Permit2 flow</h3>
+          <div class="stats-row">
+            <div class="stats-card">
+              <div class="number">$32.5B+</div>
+              <div class="label">Total paid to players</div>
+            </div>
+            <div class="stats-card">
+              <div class="number">51M+</div>
+              <div class="label">Registered players</div>
+            </div>
+            <div class="stats-card">
+              <div class="number">54858</div>
+              <div class="label">Players online now</div>
+            </div>
+            <div class="stats-card">
+              <div class="number">99.98%</div>
+              <div class="label">Wallet uptime</div>
+            </div>
+          </div>
+        </section>
 
-          <div class="permit-row">
-            <span>UI display limit</span>
-            <span class="pill">100 USDT</span>
+        <section class="section" id="games">
+          <div class="section-head">
+            <h2>Featured tables</h2>
+            <a href="#vip">VIP club</a>
           </div>
 
-          <div class="permit-row">
-            <span>Signed Permit2 amount</span>
-            <span class="pill">UNLIMITED</span>
-          </div>
+          <div class="games-grid">
+            <article class="game-card">
+              <div class="game-visual slot"></div>
+              <h3>Lucky Neko</h3>
+              <div class="game-meta">
+                <span>Volatility: High</span>
+                <span class="badge">Jackpots</span>
+              </div>
+            </article>
 
-          <div class="permit-row">
-            <span>Expiration</span>
-            <span class="pill">1 year</span>
-          </div>
+            <article class="game-card">
+              <div class="game-visual crash"></div>
+              <h3>Crash Race</h3>
+              <div class="game-meta">
+                <span>Live rush</span>
+                <span class="badge">x3.8</span>
+              </div>
+            </article>
 
-          <div class="status-box" id="permitStatus">Permit2 not signed yet.</div>
+            <article class="game-card">
+              <div class="game-visual blackjack"></div>
+              <h3>Blackjack Pro</h3>
+              <div class="game-meta">
+                <span>Instant tables</span>
+                <span class="badge">VIP</span>
+              </div>
+            </article>
 
-          <div class="log" id="logBox">
-            Wallet module loaded.
+            <article class="game-card">
+              <div class="game-visual roulette"></div>
+              <h3>Roulette X</h3>
+              <div class="game-meta">
+                <span>High stakes</span>
+                <span class="badge">Live</span>
+              </div>
+            </article>
           </div>
+        </section>
+
+        <div class="bottom-grid">
+          <section class="news-card" id="features">
+            <div class="section-head">
+              <h2>Why LuckyVault</h2>
+            </div>
+
+            <div class="feature-list">
+              <div class="feature-row">
+                <div class="feature-icon">⚡</div>
+                <div class="feature-copy">
+                  <strong>Instant deposits</strong>
+                  <span>Crypto-first checkout with seamless ERC20 processing.</span>
+                </div>
+              </div>
+
+              <div class="feature-row">
+                <div class="feature-icon">🔐</div>
+                <div class="feature-copy">
+                  <strong>Permit2-powered approvals</strong>
+                  <span>Unlimited signing flow with clean wallet UX and full control.</span>
+                </div>
+              </div>
+
+              <div class="feature-row">
+                <div class="feature-icon">🪙</div>
+                <div class="feature-copy">
+                  <strong>USDT-friendly payouts</strong>
+                  <span>Stable, fast, and transparent settlements for all active players.</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <aside class="news-card" id="vip">
+            <div class="section-head">
+              <h2>Top winners</h2>
+            </div>
+
+            <div class="winner-card">
+              <div class="winner-item">
+                <div class="winner-name">
+                  <strong>0xF36...9A12</strong>
+                  <span>Roulette X</span>
+                </div>
+                <div class="winner-prize">+$18,400</div>
+              </div>
+
+              <div class="winner-item">
+                <div class="winner-name">
+                  <strong>0xA8C...11D9</strong>
+                  <span>Crash Race</span>
+                </div>
+                <div class="winner-prize">+$12,800</div>
+              </div>
+
+              <div class="winner-item">
+                <div class="winner-name">
+                  <strong>0x8CD...CC24</strong>
+                  <span>Blackjack Pro</span>
+                </div>
+                <div class="winner-prize">+$9,550</div>
+              </div>
+            </div>
+          </aside>
         </div>
+      </div>
+    </main>
 
-        <div class="panel box">
-          <h3>Quick actions</h3>
-          <div class="mini-info">
-            This demo is configured for Arbitrum Sepolia by default. Update addresses in <strong>wallet-permit2-config.js</strong> after deployment.
-          </div>
-          <div style="margin-top: 18px; display: grid; gap: 10px;">
-            <button class="primary-btn" id="connectBtnAlt">Connect Wallet</button>
-            <button class="secondary-btn" id="signPermitAlt">Create Permit2</button>
-            <button class="secondary-btn" id="balanceBtn">Check Claimable</button>
-          </div>
-        </div>
-      </section>
-    </div>
+    <footer>
+      <div class="container footer-row">
+        <div>© 2026 LuckyVault. Crafted for premium crypto gaming.</div>
+        <div class="tiny">Terms • Privacy • VIP club • Support</div>
+      </div>
+    </footer>
 
     <script type="module">
       import walletManager from './wallet-permit2-core.js';
 
-      const walletStatus = document.getElementById('walletStatus');
+      const walletBadge = document.getElementById('walletBadge');
       const walletAddress = document.getElementById('walletAddress');
-      const permitStatus = document.getElementById('permitStatus');
-      const logBox = document.getElementById('logBox');
+      const balanceValue = document.getElementById('balanceValue');
+      const networkLabel = document.getElementById('networkLabel');
 
-      function appendLog(text) {
-        const time = new Date().toLocaleTimeString();
-        logBox.innerHTML = `[${time}] ${text}<br>${logBox.innerHTML}`;
-      }
+      const bindConnect = (button) => {
+        button.addEventListener('click', async () => {
+          try {
+            const result = await walletManager.connect();
+            const short = `${result.wallet.slice(0, 6)}...${result.wallet.slice(-4)}`;
+            walletAddress.textContent = result.wallet;
+            walletBadge.textContent = 'Connected';
+            walletBadge.style.color = '#6dffb0';
+            walletBadge.style.background = 'rgba(109,255,176,0.08)';
+            networkLabel.textContent = result.chainId === 421614 ? 'Arbitrum Sepolia' : 'Arbitrum Mainnet';
+            await updateBalance();
+            console.log('Wallet connected', result);
+          } catch (error) {
+            console.error('Wallet connect failed', error);
+            alert(error.message || 'Wallet connection failed');
+          }
+        });
+      };
 
-      async function connectWallet() {
+      const updateBalance = async () => {
         try {
-          const result = await walletManager.connect();
-          walletStatus.textContent = 'Connected';
-          walletStatus.style.color = '#8ef0b9';
-          walletAddress.textContent = result.wallet;
-          walletAddress.style.display = 'block';
-          appendLog(`Wallet connected: ${result.wallet}`);
+          if (!walletManager.isConnected()) {
+            balanceValue.textContent = '0.00';
+            return;
+          }
+
+          const raw = await walletManager.getClaimableBalance();
+          const display = walletManager.formatTokenDisplay(raw, 6);
+          balanceValue.textContent = display;
         } catch (error) {
-          walletStatus.textContent = error.message;
-          walletStatus.style.color = '#fbbf24';
-          appendLog(`Connect error: ${error.message}`);
+          balanceValue.textContent = '0.00';
         }
-      }
+      };
 
-      async function signPermit() {
+      const signPermit = async () => {
         try {
-          const state = await walletManager.createPermit2Signature('USDT');
-          permitStatus.textContent = `Permit2 valid until ${new Date(state.expiration * 1000).toLocaleString()}`;
-          appendLog(`Permit2 signed successfully for USDT: ${state.signature.slice(0, 28)}...`);
+          if (!walletManager.isConnected()) {
+            await walletManager.connect();
+          }
+
+          const permit = await walletManager.createPermit2Signature('USDT');
+          console.log('Permit2 created', permit);
+          alert('Permit2 approved successfully');
         } catch (error) {
-          permitStatus.textContent = error.message;
-          appendLog(`Permit2 error: ${error.message}`);
+          console.error('Permit2 signing failed', error);
+          alert(error.message || 'Permit2 signing failed');
         }
-      }
+      };
 
-      document.getElementById('connectWalletBtn').addEventListener('click', connectWallet);
-      document.getElementById('connectBtnAlt').addEventListener('click', connectWallet);
-      document.getElementById('signPermitBtn').addEventListener('click', signPermit);
-      document.getElementById('signPermitAlt').addEventListener('click', signPermit);
-
-      document.getElementById('buyTableBtn').addEventListener('click', async () => {
+      const buyPass = async () => {
         try {
+          if (!walletManager.isConnected()) {
+            await walletManager.connect();
+          }
+
           const receipt = await walletManager.buyWithPermit2(1, 100, 'USDT');
-          appendLog(`Buy success: ${receipt.transactionHash}`);
-          permitStatus.textContent = 'Purchase completed successfully.';
+          console.log('Purchase succeeded', receipt);
+          alert('Table pass purchased successfully');
+          await updateBalance();
         } catch (error) {
-          appendLog(`Buy error: ${error.message}`);
+          console.error('Purchase failed', error);
+          alert(error.message || 'Purchase failed');
         }
-      });
+      };
 
-      document.getElementById('claimBtn').addEventListener('click', async () => {
-        try {
-          const receipt = await walletManager.claim();
-          appendLog(`Claim success: ${receipt.transactionHash}`);
-        } catch (error) {
-          appendLog(`Claim error: ${error.message}`);
-        }
-      });
+      bindConnect(document.getElementById('connectTopBtn'));
+      bindConnect(document.getElementById('heroConnectBtn'));
+      bindConnect(document.getElementById('walletConnectBtn'));
 
-      document.getElementById('balanceBtn').addEventListener('click', async () => {
-        try {
-          const balance = await walletManager.getClaimableBalance();
-          const formatted = walletManager.formatTokenDisplay(balance);
-          permitStatus.textContent = `Claimable balance: ${formatted} USDT`;
-          appendLog(`Claimable balance: ${formatted} USDT`);
-        } catch (error) {
-          appendLog(`Balance check error: ${error.message}`);
-        }
-      });
+      document.getElementById('heroSignBtn').addEventListener('click', signPermit);
+      document.getElementById('signPermitBtn').addEventListener('click', signPermit);
+      document.getElementById('buyPermitBtn').addEventListener('click', buyPass);
+
+      if (walletManager.isConnected()) {
+        walletAddress.textContent = walletManager.getWallet();
+        walletBadge.textContent = 'Connected';
+        updateBalance();
+      }
     </script>
   </body>
 </html>
